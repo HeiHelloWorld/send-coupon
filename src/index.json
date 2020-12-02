@@ -1,0 +1,10 @@
+{
+  "component": true,
+  "usingComponents": {
+    "other": "./other",
+    "send-coupon": "plugin://sendCoupon/send-coupon"
+  },
+  "componentGenerics": {
+    "genericsTest": true
+  }
+}

@@ -1,0 +1,17 @@
+<view wx:if="{{!receive_success && stock_list.length}}" >
+  <send-coupon
+    bindcustomevent="_getcoupon"
+    send_coupon_params="{{sendWill}}"
+    sign="{{sign}}"
+    send_coupon_merchant="{{send_coupon_merchant}}"
+  >
+    <other stock_list="{{stock_list}}" /> 
+  </send-coupon>
+</view>
+<view wx:elif="{{receive_success && stock_list.length}}">
+  <other stock_list="{{stock_list}}" bind:_moreCouponDetail="moreCouponDetail" />
+</view>
+<view wx:else class="empty-wrap" >
+  <view class="empty-icon"></view>
+  <text class="empty-slogan">暂无可领取的优惠券</text>
+</view>

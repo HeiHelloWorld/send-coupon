@@ -1,0 +1,24 @@
+<view 
+  wx:if="{{stock_list.length===1}}" 
+  class="coupon-wrap" 
+  data-id="0" 
+  bindtap="_moreCouponDetail" 
+>
+  <view class="coupon-main">类型1: 一张券</view>
+  <view class="coupon-btn">立即使用</view>
+</view>
+<view wx:else class="coupon-wrap">
+  <view class="coupon-header">
+    <image class="coupon-header-img" src="https://cdn.haowuji123.com/statics/logo.png" />
+    <view class="coupon-header-title">好物集福利社</view>
+  </view>
+  <view 
+    wx:for="{{stock_list}}" 
+    wx:key="index" 
+    data-id="{{index}}" 
+    class="coupon-main-more" 
+    bindtap="_moreCouponDetail"
+  >类型2: 多张券</view>
+  <view class="coupon-btn coupon-btn-more" data-id="0" bindtap="_moreCouponDetail">立即使用</view>
+</view>
+

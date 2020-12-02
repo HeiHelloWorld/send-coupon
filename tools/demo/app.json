@@ -1,0 +1,20 @@
+{
+  "pages":[
+    "pages/index/index"
+  ],
+  "window":{
+    "backgroundTextStyle":"light",
+    "navigationBarBackgroundColor": "#fff",
+    "navigationBarTitleText": "好物集发券组件",
+    "navigationBarTextStyle":"black"
+  },
+  "usingComponents": {
+    "compon": "/components/index"
+  },
+  "plugins": {
+    "sendCoupon": {
+      "version": "1.1.5",
+      "provider": "wxf3f436ba9bd4be7b"
+    }
+  }
+}
