@@ -38,7 +38,6 @@ Component({
     open_some_one: 0, // 默认打开第一张券详情
     open_detail_params: [], // 打开多张券详情时的缓存数据
     receive_success: false, // 领券成功
-    sendAll: true, // 都可领
   },
   pageLifetimes: {
     show() {
@@ -105,8 +104,7 @@ Component({
               sign: res.data.sign,
               send_coupon_merchant: res.data.send_coupon_merchant,
               stock_list: couponData,
-              sendWill,
-              sendAll: sendWill.length === couponData.length
+              sendWill
             }, () => {
               _this.sendCouponShow(couponData)
             })
@@ -145,19 +143,19 @@ Component({
     _getcoupon(params) {
       console.log('领券插件', params)
       if (params.detail.errcode === 'OK') {
-        const data = params.detail.send_coupon_result, { sendAll, stock_list } = this.data
+        const data = params.detail.send_coupon_result, { stock_list } = this.data;
         // 领券结果上报
         // this.sendCouponResult(data);
 
         const results = data.filter(g => g.code === 'SUCCESS')
         if (results.length > 0) {
-          if (!sendAll) {
-            stock_list.forEach((v, i) => {
-              const sd = results.find(g => g.stock_id === v.stock_id)
-              if (sd) v.coupon_code = sd.coupon_code
-            })
-          }
-          this.setData({open_detail_params: stock_list}, () => {
+          const open_detail_params = stock_list.reduce((pre, cur) => {
+            const sd = results.find(g => g.stock_id === cur.stock_id);
+            if (sd) cur.coupon_code = sd.coupon_code;
+            pre.push(cur);
+            return pre;
+          }, []);
+          this.setData({open_detail_params}, () => {
             this.openCouponDetail()
           })
         } else {
@@ -218,7 +216,7 @@ Component({
         method: 'POST',
         data,
         success: res => {
-          console.log('打开券列表', res.data)
+          console.log('打开券列表------------->', res.data)
           res.data.card_list.forEach((v, i) => {
             v.cardId = v.card_id
             v.openCardParams = v.open_params

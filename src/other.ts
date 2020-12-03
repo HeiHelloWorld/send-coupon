@@ -22,7 +22,8 @@ Component({
     // 点击单张券
     _moreCouponDetail(e) {
       const id = e.currentTarget.dataset.id;
-      this.triggerEvent('_moreCouponDetail', id);
+      console.log('点击单张券 -----------', id);
+      this.triggerEvent('_someOneDetail', id);
     }
   }
 })
