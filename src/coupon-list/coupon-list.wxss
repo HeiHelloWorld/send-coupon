@@ -1,0 +1,62 @@
+/* @import "./common.wxss"; */
+/* @import "./reset.wxss"; */
+
+.coupon-wrap {
+  padding: 20rpx;
+}
+.coupon-main {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 600rpx;
+  margin-bottom: 60rpx;
+  font-size: 48rpx;
+  background-color: #fff;
+  border-radius: 20rpx;
+}
+
+.coupon-btn {
+  width: 100%;
+  height: 80rpx;
+  line-height: 80rpx;
+  text-align: center;
+  font-size: 36rpx;
+  color: #fff;
+  border-radius: 10rpx;
+  background-color: rgb(9, 112, 23);
+}
+
+
+/* 多张券 */
+
+.coupon-btn-more {
+  width: 300rpx;
+  margin: 30rpx auto;
+}
+
+.coupon-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+.coupon-header-img {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: 100%;
+}
+.coupon-header-title {
+  margin: 30rpx 0rpx;
+  font-size: 48rpx;
+}
+.coupon-main-more {
+  width: 100%;
+  height: 200rpx;
+  line-height: 200rpx;
+  text-align: center;
+  font-size: 36rpx;
+  margin-bottom: 20rpx;
+  background-color: #fff;
+  border-radius: 20rpx;
+}

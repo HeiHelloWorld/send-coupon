@@ -1,6 +1,7 @@
-import api from '../tools/demo/utils/request'
-const _ = require('./utils')
-let _this = null
+import api from './tools/request';
+import Tool from './utils';
+const TIP = require("./tools/tip").default;
+let _this = null;
 
 Component({
   options: {
@@ -53,15 +54,9 @@ Component({
   lifetimes: {
     // 在组件实例进入页面节点树时执行
     attached() {
-      _this = this
-      this.getAdvData()
-      wx.getSystemInfo({
-        success: () => {
-          this.setData({
-            flag: _.getFlag(),
-          })
-        }
-      })
+      _this = this;
+      this.setData({flag: Tool.getFlag()})
+      this.getAdvData();
     },
     // 在组件实例被从页面节点树移除时执行
     detached() {
@@ -82,15 +77,15 @@ Component({
         // { key: 'tag_id', value: tag_id }
       ].filter(v => !v.value)[0];
       if (kong) {
-        global.tip.toast(`缺少必需参数: ${kong.key}`);
+        TIP.toast(`缺少必需参数: ${kong.key}`);
         return;
       }
       if (!r.test(stock_max)) {
-        global.tip.toast(`传入的 stock_max 有误 !`);
+        TIP.toast(`传入的 stock_max 有误 !`);
         return;
       }
       const data = { loc_name, token, openid, tag_id, stock_max };
-      global.tip.loading()
+      TIP.loading()
       api.doRequestCheckSessionSendCoupon({
         path: 'pay_ad/ad_busifavor',
         method: 'POST',
@@ -109,11 +104,11 @@ Component({
               _this.sendCouponShow(couponData)
             })
           } else {
-            global.tip.toast(res.data.message || '获取优惠券信息失败 !')
+            TIP.toast(res.data.message || '获取优惠券信息失败 !')
           }
-          global.tip.loaded()
+          TIP.loaded()
         },
-        fail(err) { global.tip.loaded() }
+        fail(err) { TIP.loaded() }
       })
     },
 
@@ -155,14 +150,17 @@ Component({
             pre.push(cur);
             return pre;
           }, []);
-          this.setData({open_detail_params}, () => {
+          this.setData({
+            open_detail_params,
+            receive_success: true
+          }, () => {
             this.openCouponDetail()
           })
         } else {
-          global.tip.toast(data[0].message)
+          TIP.toast(data[0].message)
         }
       } else {
-        global.tip.toast(params.detail.msg)
+        TIP.toast(params.detail.msg)
       }
     },
 
@@ -216,7 +214,7 @@ Component({
         method: 'POST',
         data,
         success: res => {
-          console.log('打开券列表------------->', res.data)
+          console.log('打开券列表->', res.data)
           res.data.card_list.forEach((v, i) => {
             v.cardId = v.card_id
             v.openCardParams = v.open_params
@@ -224,7 +222,6 @@ Component({
             delete v.card_id
             delete v.open_params
           })
-          _this.setData({receive_success: true})
           wx.openCard({
             cardList: res.data.card_list,
             complete: res => {

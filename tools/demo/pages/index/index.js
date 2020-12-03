@@ -4,7 +4,7 @@ Page({
     openid: 'oiSTd4ow_eg72QA9AFIoxw4qYTqM',
     stock_max: 3,
     loc_name: 'fb_ad_loc',
-    tag_id: ''
+    tag_id: '',
   },
 
   /**

@@ -5,11 +5,13 @@
   sign="{{sign}}"
   send_coupon_merchant="{{send_coupon_merchant}}"
 >
-  <other stock_list="{{stock_list}}" bind:_someOneDetail="moreCouponDetail" /> 
+  <coupon-list stock_list="{{stock_list}}" bind:_someOneDetail="moreCouponDetail" /> 
 </send-coupon>
-<view wx:elif="{{receive_success && stock_list.length}}">
-  <other stock_list="{{stock_list}}" bind:_someOneDetail="moreCouponDetail" />
-</view>
+<coupon-list 
+  wx:elif="{{receive_success && stock_list.length}}" 
+  stock_list="{{stock_list}}" 
+  bind:_someOneDetail="moreCouponDetail" 
+/>
 <view wx:else class="empty-wrap" >
   <view class="empty-icon"></view>
   <text class="empty-slogan">暂无可领取的优惠券</text>
