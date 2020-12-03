@@ -1,5 +1,5 @@
-@import "./common.wxss";
-@import "./reset.wxss";
+/* @import "./common.wxss"; */
+/* @import "./reset.wxss"; */
 
 .coupon-wrap {
   padding: 20rpx;

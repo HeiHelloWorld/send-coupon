@@ -52,9 +52,6 @@ module.exports = {
               cacheDirectory: true,
             },
           }
-          // ,{
-          //   loader: 'eslint-loader',
-          // }
         ],
         exclude: /node_modules/
       }, {
@@ -77,9 +74,6 @@ module.exports = {
                 happyPackMode: true,
               },
             }
-          // , {
-          //     loader: 'eslint-loader',
-          //   }
           ],
       }],
     },

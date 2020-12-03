@@ -1,6 +1,8 @@
 @import "./common.wxss";
 @import "./reset.wxss";
-
+.send-comp-warp {
+  height: 100%;
+}
 .empty-wrap {
   display: flex;
   flex-direction: column;

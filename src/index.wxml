@@ -1,4 +1,4 @@
-<view wx:if="{{!receive_success && stock_list.length}}" >
+<view wx:if="{{!receive_success && stock_list.length}}" class="send-comp-warp" >
   <send-coupon
     bindcustomevent="_getcoupon"
     send_coupon_params="{{sendWill}}"
