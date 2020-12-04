@@ -9,7 +9,7 @@ Component({
     }
   },
   data: {
-
+    coupon_receive: 'https://cdn.haowuji123.com/statics/coupon-receive-cy@2x.png'
   },
   /**
    * 组件的方法列表

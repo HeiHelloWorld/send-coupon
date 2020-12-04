@@ -8,6 +8,7 @@
   <view class="coupon-btn">立即使用</view>
 </view>
 <view wx:else class="coupon-wrap">
+  <view class="page-header"></view>
   <view class="coupon-header">
     <image class="coupon-header-img" src="https://cdn.haowuji123.com/statics/logo.png" />
     <view class="coupon-header-title">好物集福利社</view>
@@ -18,6 +19,21 @@
     data-id="{{index}}" 
     class="coupon-main-more" 
     bindtap="_moreCouponDetail"
-  >类型2: 多张券</view>
+  >
+    <view class="coupon-left">
+      <image src="{{item.logo}}" class="brand-logo" />
+      <view class="coupon-info">
+        <view class="coupon-name">{{item.name}}</view>
+        <view class="coupon-time">有效期 {{item.start_time}} - {{item.end_time}}</view>
+      </view>
+    </view>
+    <view class="coupon-right">
+      <view class="coupon-money-wrap">
+        <text class="coupon-money-num">{{item.coupon_value/100}}</text> <text class="coupon-money-ds">元</text>
+      </view>
+      <view class="coupon-min-money">满{{item.transaction_minimum/100}}元可用</view>
+    </view>
+    <image src="{{coupon_receive}}" class="received" />
+  </view>
   <view class="coupon-btn coupon-btn-more" data-id="0" bindtap="_moreCouponDetail">立即使用</view>
 </view>

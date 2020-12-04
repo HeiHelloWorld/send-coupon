@@ -18,7 +18,7 @@ Component({
     },
     stock_max: { // 券数量
       type: Number,
-      value: 1
+      value: 0
     },
     loc_name: { // 流量位标识
       type: String,
@@ -55,17 +55,69 @@ Component({
     // 在组件实例进入页面节点树时执行
     attached() {
       _this = this;
-      this.setData({flag: Tool.getFlag()})
-      this.getAdvData();
+      this.setData({ flag: Tool.getFlag() })
+      console.log('Tool', Tool.timestampToDay('1607510346'));
     },
     // 在组件实例被从页面节点树移除时执行
     detached() {
 
     },
   },
+  observers: {
+    'stock_max': function (val) {
+      console.log('数据监听', val)
+      if (val !== 0) {
+        Promise.all([this.getCouponSty(), this.getAdvData()]).then(([value1, value2]) => {
+          const sendWill = value2.stock_list.filter(v => v.send_type === 1);
+
+          const stock_list = value2.stock_list.reduce((pre, cur) => {
+            const couponObj = value1.stock_mat.find(v => v.stock_id === cur.stock_id);
+            Object.assign(cur, couponObj);
+            cur.start_time = Tool.timestampToDay(cur.available_begin_time)
+            cur.end_time = Tool.timestampToDay(cur.available_end_time)
+            pre.push(cur)
+            return pre;
+          }, []);
+
+          console.log('stock_list', stock_list);
+          _this.setData({
+            stock_list,
+            sign: value2.sign,
+            send_coupon_merchant: value2.send_coupon_merchant,
+            sendWill
+          }, () => _this.sendCouponShow(value2.stock_list));
+        })
+      }
+    }
+  },
   methods: {
     /**
-     * 获取优惠券信息
+     * 获取优惠券素材
+     */
+    getCouponSty() {
+      const { token, loc_name } = this.data;
+      return new Promise((resolve, reject) => {
+        api.doRequestCheckSessionSendCoupon({
+          path: 'pay_ad/ad_material',
+          method: 'POST',
+          data: {
+            loc_name,
+            token
+          },
+          success(res) {
+            if (res.data.stock_mat) {
+              resolve(res.data)
+            } else {
+              TIP.toast(res.data.message || '获取优惠券素材失败 !')
+              reject(res.data)
+            }
+          },
+          fail(err) { reject(err) }
+        })
+      })
+    },
+    /**
+     * 获取优惠券批次信息
      * @param {*} params 
      */
     getAdvData() {
@@ -86,29 +138,26 @@ Component({
       }
       const data = { loc_name, token, openid, tag_id, stock_max };
       TIP.loading()
-      api.doRequestCheckSessionSendCoupon({
-        path: 'pay_ad/ad_busifavor',
-        method: 'POST',
-        data,
-        success(res) {
-          console.log('获取优惠券 ', res.data)
-          const couponData = res.data.stock_list
-          if (couponData) {
-            const sendWill = couponData.filter(g => g.send_type === 1)
-            _this.setData({
-              sign: res.data.sign,
-              send_coupon_merchant: res.data.send_coupon_merchant,
-              stock_list: couponData,
-              sendWill
-            }, () => {
-              _this.sendCouponShow(couponData)
-            })
-          } else {
-            TIP.toast(res.data.message || '获取优惠券信息失败 !')
+      return new Promise((resolve, reject) => {
+        api.doRequestCheckSessionSendCoupon({
+          path: 'pay_ad/ad_busifavor',
+          method: 'POST',
+          data,
+          success(res) {
+            const couponData = res.data.stock_list
+            if (couponData) {
+              resolve(res.data)
+            } else {
+              TIP.toast(res.data.message || '获取优惠券信息失败 !')
+              reject(res.data)
+            }
+            TIP.loaded()
+          },
+          fail(err) {
+            TIP.loaded();
+            reject(err)
           }
-          TIP.loaded()
-        },
-        fail(err) { TIP.loaded() }
+        })
       })
     },
 

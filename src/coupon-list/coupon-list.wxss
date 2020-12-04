@@ -2,7 +2,8 @@
 /* @import "./reset.wxss"; */
 
 .coupon-wrap {
-  padding: 20rpx;
+  width: 100%;
+  height: 100vh;
 }
 .coupon-main {
   display: flex;
@@ -22,17 +23,28 @@
   line-height: 80rpx;
   text-align: center;
   font-size: 36rpx;
-  color: #fff;
+  color: #FFF;
   border-radius: 10rpx;
   background-color: rgb(9, 112, 23);
 }
 
 
 /* 多张券 */
-
+.page-header {
+  width: 100%;
+  height: 274rpx;
+  background-image: url('https://cdn.haowuji123.com/statics/coupon-header-cy@2x.png');
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+}
 .coupon-btn-more {
-  width: 300rpx;
-  margin: 30rpx auto;
+  width: 358rpx;
+  height: 100rpx;
+  line-height: 100rpx;
+  font-size: 32rpx;
+  border-radius: 4rpx;
+  background: #2BA064;
+  margin: 58rpx auto 0rpx;
 }
 
 .coupon-header {
@@ -42,21 +54,90 @@
   width: 100%;
 }
 .coupon-header-img {
-  width: 80rpx;
-  height: 80rpx;
+  width: 120rpx;
+  height: 120rpx;
   border-radius: 100%;
 }
 .coupon-header-title {
-  margin: 30rpx 0rpx;
-  font-size: 48rpx;
+  margin: 24rpx 0rpx 38rpx 0rpx;
+  height: 40rpx;
+  line-height: 40rpx;
+  font-size: 40rpx;
+  color: #000;
+
 }
+/* 单张券样式 */
 .coupon-main-more {
-  width: 100%;
-  height: 200rpx;
-  line-height: 200rpx;
-  text-align: center;
-  font-size: 36rpx;
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  width: 706rpx;
+  height: 166rpx;
+  font-size: 28rpx;
+  margin: 0rpx 0rpx 20rpx 22rpx;
+  background-image: url('https://cdn.haowuji123.com/statics/coupon-bg-cy@2x.png');
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+}
+.coupon-left {
+  display: flex;
+  width: 460rpx;
+}
+.brand-logo {
+  width: 138rpx;
+  height: 138rpx;
+  margin: 14rpx;
+  border-radius: 100%;
+}
+.coupon-info {
+  padding-top: 46rpx;
+}
+.coupon-name {
+  height: 28rpx;
+  line-height: 28rpx;
   margin-bottom: 20rpx;
-  background-color: #fff;
-  border-radius: 20rpx;
+  font-size: 28rpx;
+  color: #000;
+}
+.coupon-time {
+  height: 22rpx;
+  line-height: 22rpx;
+  font-size: 22rpx;
+  color: #787878;
+}
+.coupon-right {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 247rpx;
+  padding-top: 26rpx;
+}
+.coupon-money-wrap {
+  height: 56rpx;
+  line-height: 56rpx;
+  margin-bottom: 24rpx;
+  font-size: 56rpx;
+  color: #FFFFFF;
+}
+.coupon-money-num {
+  
+}
+.coupon-money-ds {
+  width: 30rpx;
+  height: 28rpx;
+  line-height: 28rpx;
+  font-size: 28rpx;
+}
+.coupon-min-money {
+  height: 28rpx;
+  line-height: 28rpx;
+  font-size: 28rpx;
+  color: #FFFFFF;
+}
+.received {
+  position: absolute;
+  top: 0rpx;
+  right: 0rpx;
+  width: 116rpx;
+  height: 106rpx;
 }

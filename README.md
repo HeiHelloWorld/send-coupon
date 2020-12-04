@@ -37,10 +37,11 @@ npm install send-coupon-cy
 2. 小程序开发者工具 -> 工具 -> 构建 npm
 3. 构建成功后小程序代码包中将产出 "miniprogram_npm" 文件夹
 ##### 三. 使用
-+ 在需要使用该组件的页面json文件中声明
++ 在需要使用该组件的页面json文件中声明(需配置自定义导航栏)
 ```
 // index.json
 {
+  "navigationStyle": "custom",
   "usingComponents": {
     "send-coupon-cy": "send-coupon-cy"
   }
@@ -66,6 +67,11 @@ npm install send-coupon-cy
 | loc_name | String | 是 | 流量位标识 |
 | tag_id | String | 是 | 广告请求人群标签, 用于定向匹配 |
 
+##### Tips
+  1. 如在index.js -> data中声明stock_max变量, 请确保其默认值为0, 否则将触发2次券列表请求！
+
+
+-------
 
 [微信公众平台]: 'https://mp.weixin.qq.com/'
 [npm支持]: 'https://developers.weixin.qq.com/miniprogram/dev/devtools/npm.html'
