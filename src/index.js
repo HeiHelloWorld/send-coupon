@@ -18,7 +18,7 @@ Component({
     },
     stock_max: { // 券数量
       type: Number,
-      value: 0
+      value: ''
     },
     loc_name: { // 流量位标识
       type: String,
@@ -27,18 +27,20 @@ Component({
     tag_id: {
       type: String,
       value: ''
-    }
+    },
+    plug_sign: String,
+    open_params: Object,
   },
   data: {
     flag: false,
 
     stock_list: [], // 展示的商户券列表
     sendWill: [], // 待领取的商户券列表
+    mateAndCouponInfo: null, // 素材和券信息
     sign: '', // 插件所需签名
-    send_coupon_merchant: '', // 发券商户号
     open_some_one: 0, // 默认打开第一张券详情
-    open_detail_params: [], // 打开多张券详情时的缓存数据
     receive_success: false, // 领券成功
+    user_click: false,  // 用户点击某张券详情
   },
   pageLifetimes: {
     show() {
@@ -55,8 +57,8 @@ Component({
     // 在组件实例进入页面节点树时执行
     attached() {
       _this = this;
-      this.setData({ flag: Tool.getFlag() })
-      console.log('Tool', Tool.timestampToDay('1607510346'));
+      TIP.loading();
+      this.setData({ flag: Tool.getFlag() });
     },
     // 在组件实例被从页面节点树移除时执行
     detached() {
@@ -64,100 +66,58 @@ Component({
     },
   },
   observers: {
-    'stock_max': function (val) {
-      console.log('数据监听', val)
-      if (val !== 0) {
-        Promise.all([this.getCouponSty(), this.getAdvData()]).then(([value1, value2]) => {
-          const sendWill = value2.stock_list.filter(v => v.send_type === 1);
-
-          const stock_list = value2.stock_list.reduce((pre, cur) => {
-            const couponObj = value1.stock_mat.find(v => v.stock_id === cur.stock_id);
-            Object.assign(cur, couponObj);
-            cur.start_time = Tool.timestampToDay(cur.available_begin_time)
-            cur.end_time = Tool.timestampToDay(cur.available_end_time)
-            pre.push(cur)
-            return pre;
-          }, []);
-
-          console.log('stock_list', stock_list);
-          _this.setData({
-            stock_list,
-            sign: value2.sign,
-            send_coupon_merchant: value2.send_coupon_merchant,
-            sendWill
-          }, () => _this.sendCouponShow(value2.stock_list));
-        })
+    'plug_sign': function (sign) {
+      const { mateAndCouponInfo } = this.data;
+      if (sign && mateAndCouponInfo && mateAndCouponInfo.sign_type === 1) this.setData({ sign });
+    },
+    'open_params': function (params) {
+      if (params instanceof Array && Array.isArray(params) && params.length && params[0]['openCardParams']) {
+        this.openCouponDetail(params);
+      }
+    },
+    'stock_max, token, openid, loc_name': function (stock_max, token, openid, loc_name) {
+      if (stock_max && token && openid && loc_name) {
+        this.getCouponInfo();
       }
     }
   },
   methods: {
     /**
-     * 获取优惠券素材
-     */
-    getCouponSty() {
-      const { token, loc_name } = this.data;
-      return new Promise((resolve, reject) => {
-        api.doRequestCheckSessionSendCoupon({
-          path: 'pay_ad/ad_material',
-          method: 'POST',
-          data: {
-            loc_name,
-            token
-          },
-          success(res) {
-            if (res.data.stock_mat) {
-              resolve(res.data)
-            } else {
-              TIP.toast(res.data.message || '获取优惠券素材失败 !')
-              reject(res.data)
-            }
-          },
-          fail(err) { reject(err) }
-        })
-      })
-    },
-    /**
-     * 获取优惠券批次信息
+     * 获取优惠券信息
      * @param {*} params 
      */
-    getAdvData() {
-      const { loc_name, token, openid, tag_id, stock_max } = this.data, r = /^\+?[1-5]*$/;
-      const kong = [
-        { key: 'loc_name', value: loc_name },
-        { key: 'token', value: token },
-        { key: 'openid', value: openid },
-        // { key: 'tag_id', value: tag_id }
-      ].filter(v => !v.value)[0];
-      if (kong) {
-        TIP.toast(`缺少必需参数: ${kong.key}`);
-        return;
-      }
-      if (!r.test(stock_max)) {
-        TIP.toast(`传入的 stock_max 有误 !`);
-        return;
-      }
+    getCouponInfo() {
+      // if (!this.verificationParameters()) return;
+      const { loc_name, token, openid, tag_id, stock_max } = this.data;
       const data = { loc_name, token, openid, tag_id, stock_max };
-      TIP.loading()
-      return new Promise((resolve, reject) => {
-        api.doRequestCheckSessionSendCoupon({
-          path: 'pay_ad/ad_busifavor',
-          method: 'POST',
-          data,
-          success(res) {
-            const couponData = res.data.stock_list
-            if (couponData) {
-              resolve(res.data)
+      api.doRequestCheckSessionSendCoupon({
+        path: 'pay_ad/ad_busifavor_assembly',
+        method: 'POST',
+        data,
+        success: res => {
+          const stock_list = res.data.stock_list;
+          if (stock_list) {
+            if (res.data.sign_type === 1) {
+              _this.triggerEvent('_getPlugSign', { stock_list })
             } else {
-              TIP.toast(res.data.message || '获取优惠券信息失败 !')
-              reject(res.data)
+              _this.setData({ sign: res.data.sign })
             }
-            TIP.loaded()
-          },
-          fail(err) {
-            TIP.loaded();
-            reject(err)
+            const sendWill = stock_list.filter(v => v.send_type === 1);
+            stock_list.map(v => {
+              v.start_time = Tool.timestampToDay(v.available_begin_time);
+              v.end_time = Tool.timestampToDay(v.available_end_time);
+            })
+            _this.setData({
+              stock_list,
+              sendWill,
+              mateAndCouponInfo: res.data
+            }, () => _this.sendCouponShow(stock_list))
+          } else {
+            TIP.toast(res.data.message || '服务器开小差了～')
           }
-        })
+          TIP.loaded()
+        },
+        fail: err => { TIP.loaded(); }
       })
     },
 
@@ -175,7 +135,7 @@ Component({
         path: 'pay_ad/ad_show_notice',
         method: 'POST',
         data,
-        success: res => console.log('优惠券展示通知', res),
+        success: res => console.log('优惠券展示上报', res.data),
         fail: err => console.error('优惠券展示上报失败', err)
       })
     },
@@ -185,29 +145,34 @@ Component({
      * @param {*} params 
      */
     _getcoupon(params) {
-      console.log('领券插件', params)
+      console.log('领券插件', params.detail)
       if (params.detail.errcode === 'OK') {
         const data = params.detail.send_coupon_result, { stock_list } = this.data;
         // 领券结果上报
         // this.sendCouponResult(data);
 
-        const results = data.filter(g => g.code === 'SUCCESS')
+        const results = data.filter(g => g.code === 'SUCCESS');
+        const failArr = data.filter(g => g.code !== 'SUCCESS');
         if (results.length > 0) {
-          const open_detail_params = stock_list.reduce((pre, cur) => {
-            const sd = results.find(g => g.stock_id === cur.stock_id);
-            if (sd) cur.coupon_code = sd.coupon_code;
-            pre.push(cur);
-            return pre;
-          }, []);
-          this.setData({
-            open_detail_params,
-            receive_success: true
-          }, () => {
-            this.openCouponDetail()
+          stock_list.map(v => {
+            const sd = results.find(g => g.stock_id === v.stock_id);
+            if (sd) v.coupon_code = sd.coupon_code;
           })
         } else {
           TIP.toast(data[0].message)
         }
+        if (failArr.length > 0) {
+          stock_list.map(v => {
+            const ob = failArr.find(g => g.stock_id === v.stock_id);
+            if (ob) v.errMsg = ob.message
+          })
+        }
+        this.setData({
+          stock_list, 
+          receive_success: true
+        }, () => {
+          this.getDetailParams()
+        })
       } else {
         TIP.toast(params.detail.msg)
       }
@@ -238,48 +203,57 @@ Component({
     },
 
     /**
-     * 打开券详情
+     * 获取打开券详情的参数
      * @param {*} params 
      */
-    openCouponDetail() {
-      let stock_list = [];
+    getDetailParams() {
+      let stockList = [];
       const {
         loc_name,
         token,
         openid,
         open_some_one,
-        open_detail_params
+        stock_list, 
+        user_click, 
+        mateAndCouponInfo 
       } = this.data;
 
-      stock_list.push({
-        stock_id: open_detail_params[open_some_one].stock_id,
-        coupon_code: open_detail_params[open_some_one].coupon_code
+      if (stock_list[open_some_one].errMsg && user_click) {
+        TIP.toast(stock_list[open_some_one].errMsg);
+        this.setData({ user_click: !user_click })
+        return;
+      }
+
+      stockList.push({
+        stock_id: stock_list[open_some_one].stock_id,
+        coupon_code: stock_list[open_some_one].coupon_code
       });
 
-      const data = { loc_name, token, openid, stock_list };
+      const data = { loc_name, token, openid, stock_list: stockList };
 
-      api.doRequestCheckSessionSendCoupon({
-        path: 'pay_ad/ad_open_card',
-        method: 'POST',
-        data,
-        success: res => {
-          console.log('打开券列表->', res.data)
-          res.data.card_list.forEach((v, i) => {
-            v.cardId = v.card_id
-            v.openCardParams = v.open_params
-
-            delete v.card_id
-            delete v.open_params
-          })
-          wx.openCard({
-            cardList: res.data.card_list,
-            complete: res => {
-              console.log('openCard => ', res)
+      if (mateAndCouponInfo.sign_type === 1) {
+        this.triggerEvent('_getOpenParams', data);
+      } else {
+        api.doRequestCheckSessionSendCoupon({
+          path: 'pay_ad/ad_open_card',
+          method: 'POST',
+          data,
+          success: res => {
+            if (res.data.card_list) {
+              res.data.card_list.forEach((v, i) => {
+                v.cardId = v.card_id
+                v.openCardParams = v.open_params
+                delete v.card_id
+                delete v.open_params
+              })
+              _this.openCouponDetail(res.data.card_list);
+            } else {
+              TIP.toast(`打开券详情失败 !`);
             }
-          })
-        },
-        fail: err => {}
-      })
+          },
+          fail: err => {}
+        })
+      }
     },
 
     /**
@@ -287,10 +261,46 @@ Component({
      * @param {*} params 
      */
     moreCouponDetail(e) {
-      const open_some_one = Number(e.detail), { receive_success } = this.data;
-      this.setData({ open_some_one })
-      if (!receive_success) return // 券未领取 将触发领券机制
-      this.openCouponDetail()
+      const open_some_one = Number(e.detail.id), { receive_success } = this.data;
+      this.setData({ open_some_one });
+      if (!receive_success) return; // 券未领取 将触发领券机制
+      this.setData({ user_click: true }, () => this.getDetailParams());
+    },
+
+    /**
+     * 打开卡券详情页
+     * @param {*} params 
+     */
+    openCouponDetail(list) {
+      wx.openCard({
+        cardList: list,
+        complete: res => {
+          console.log('openCard => ', res)
+        }
+      })
+    },
+
+    /**
+     * 参数验证
+     * @param {*} params 
+     */
+    verificationParameters() {
+      const { loc_name, token, openid, tag_id, stock_max } = this.data, r = /^\+?[1-5]*$/;
+      const kong = [
+        { key: 'loc_name', value: loc_name },
+        { key: 'token', value: token },
+        { key: 'openid', value: openid },
+        // { key: 'tag_id', value: tag_id }
+      ].filter(v => !v.value)[0];
+      if (kong) {
+        TIP.toast(`缺少必需参数: ${kong.key}`);
+        return false;
+      };
+      if (!r.test(stock_max)) {
+        TIP.toast(`传入的 stock_max 有误 !`);
+        return false; 
+      };
+      return true;
     },
   }
 })

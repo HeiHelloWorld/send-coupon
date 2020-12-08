@@ -1,39 +1,51 @@
 <view 
-  wx:if="{{stock_list.length===1}}" 
-  class="coupon-wrap" 
+  wx:if="{{stock_max===1}}" 
+  class="coupon-wrap coupon-one-bg" 
+  style="background-image:url('{{mateInfo.main_pic}}')"
   data-id="0" 
   bindtap="_moreCouponDetail" 
 >
-  <view class="coupon-main">类型1: 一张券</view>
-  <view class="coupon-btn">立即使用</view>
+  <!-- <image src="{{mateInfo.main_pic}}" mode="widthFix" /> -->
+  <view class="coupon-wrap-main" style="display:none;">
+    <view class="coupon-main">类型1: 一张券</view>
+    <view class="coupon-btn">立即使用</view>
+  </view>
 </view>
 <view wx:else class="coupon-wrap">
-  <view class="page-header"></view>
-  <view class="coupon-header">
-    <image class="coupon-header-img" src="https://cdn.haowuji123.com/statics/logo.png" />
-    <view class="coupon-header-title">好物集福利社</view>
-  </view>
-  <view 
-    wx:for="{{stock_list}}" 
-    wx:key="index" 
-    data-id="{{index}}" 
-    class="coupon-main-more" 
-    bindtap="_moreCouponDetail"
-  >
-    <view class="coupon-left">
-      <image src="{{item.logo}}" class="brand-logo" />
-      <view class="coupon-info">
-        <view class="coupon-name">{{item.name}}</view>
-        <view class="coupon-time">有效期 {{item.start_time}} - {{item.end_time}}</view>
-      </view>
+  <view class="coupon-wrap-main">
+    <view class="page-header"></view>
+    <view class="coupon-header">
+      <image class="coupon-header-img" src="{{mateInfo.main_logo}}" />
+      <view class="coupon-header-title">{{mateInfo.main_title}}</view>
     </view>
-    <view class="coupon-right">
-      <view class="coupon-money-wrap">
-        <text class="coupon-money-num">{{item.coupon_value/100}}</text> <text class="coupon-money-ds">元</text>
+    <view 
+      wx:for="{{stock_list}}" 
+      wx:key="index" 
+      data-id="{{index}}" 
+      class="coupon-main-more" 
+      bindtap="_moreCouponDetail"
+    >
+      <view class="coupon-left">
+        <image src="{{item.logo}}" class="brand-logo" />
+        <view class="coupon-info">
+          <view class="coupon-name">{{item.name}}</view>
+          <view class="coupon-time">有效期 {{item.start_time}} - {{item.end_time}}</view>
+        </view>
       </view>
-      <view class="coupon-min-money">满{{item.transaction_minimum/100}}元可用</view>
+      <view class="coupon-right">
+        <view class="coupon-money-wrap">
+          <text class="coupon-money-num">{{item.coupon_value/100}}</text> <text class="coupon-money-ds">元</text>
+        </view>
+        <view class="coupon-min-money">满{{item.transaction_minimum/100}}元可用</view>
+      </view>
+      <image wx:if="{{item.send_type === 0 || item.coupon_code !== ''}}" src="{{coupon_receive}}" class="received" />
     </view>
-    <image src="{{coupon_receive}}" class="received" />
+    <view class="coupon-btn coupon-btn-more" data-id="0" bindtap="_moreCouponDetail">{{mateInfo.btn_text}}</view>
   </view>
-  <view class="coupon-btn coupon-btn-more" data-id="0" bindtap="_moreCouponDetail">立即使用</view>
+</view>
+<view wx:if="{{stock_max>1}}" class="coupon-wrap-footer">
+  <view class="coupon-wrap-footer-top">
+    <image src="../assets/wx-pay-icon@2x.png" /><span>使用微信支付自动抵扣</span>
+  </view>
+  <view class="coupon-wrap-footer-bottom">代金券可在 我 - 卡包 中查看</view>
 </view>

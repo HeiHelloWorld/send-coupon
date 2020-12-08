@@ -1,15 +1,17 @@
 <send-coupon
-  wx:if="{{!receive_success && stock_list.length}}"
-  bindcustomevent="_getcoupon"
-  send_coupon_params="{{sendWill}}"
-  sign="{{sign}}"
-  send_coupon_merchant="{{send_coupon_merchant}}"
+  wx:if="{{!receive_success && stock_list.length}}" 
+  bindcustomevent="_getcoupon" 
+  send_coupon_params="{{sendWill}}" 
+  sign="{{sign}}" 
+  send_coupon_merchant="{{mateAndCouponInfo.send_coupon_merchant}}" 
 >
-  <coupon-list stock_list="{{stock_list}}" bind:_someOneDetail="moreCouponDetail" /> 
+  <coupon-list mateInfo="{{mateAndCouponInfo.mat_info}}" stock_list="{{stock_list}}" stock_max="{{stock_max}}" bind:_someOneDetail="moreCouponDetail" /> 
 </send-coupon>
 <coupon-list 
   wx:elif="{{receive_success && stock_list.length}}" 
+  mateInfo="{{mateAndCouponInfo.mat_info}}" 
   stock_list="{{stock_list}}" 
+  stock_max="{{stock_max}}" 
   bind:_someOneDetail="moreCouponDetail" 
 />
 <view wx:else class="empty-wrap" >
