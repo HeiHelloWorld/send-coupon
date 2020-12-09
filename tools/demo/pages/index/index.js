@@ -9,54 +9,49 @@ Page({
     stock_max: 0,
     loc_name: '',
     tag_id: '',
-    plug_sign: '',
-    open_params: []
   },
 
-  getPlugSign(e) {
-    console.log('第三方页面获取签名', e.detail.stock_list);
-    const stock_list = e.detail.stock_list;
-    api.doRequestCheckSessionSendCoupon({
-      path: 'pay_ad/mock_send_sign',
-      method: 'POST',
-      data: { stock_list },
-      success: res => {
-        console.log('签名结果', res.data.sign)
-        if (res.data.sign) {
-          this.setData({
-            plug_sign: res.data.sign
-          })
-        }
-      },
-      fail: err => {}
-    })
-  },
-
-  getOpenParams(e) {
-    console.log('第三方页面获取券详情参数', e.detail);
-    const data = e.detail;
-
-    api.doRequestCheckSessionSendCoupon({
-      path: 'pay_ad/ad_open_card',
-      method: 'POST',
-      data,
-      success: res => {
-        if (res.data.card_list) {
-          res.data.card_list.forEach((v, i) => {
-            v.cardId = v.card_id
-            v.openCardParams = v.open_params
-            delete v.card_id
-            delete v.open_params
-          })
-          _this.setData({
-            open_params: res.data.card_list
-          })
-        } else {
-          TIP.toast(`打开券详情失败 !`);
-        }
-      },
-      fail: err => {}
-    })
+  setPlugData(e) {
+    const params = e.detail;
+    if (params.type === 'SENDCOUPON') {
+      console.log('获取插件签名: ', params);
+      const stock_list = params.data;
+      api.doRequestCheckSessionSendCoupon({
+        path: 'pay_ad/mock_send_sign',
+        method: 'POST',
+        data: { stock_list },
+        success: res => {
+          console.log('签名结果', res.data.sign)
+          if (res.data.sign) {
+            params.setPlugParams(res.data.sign);
+          }
+        },
+        fail: err => {}
+      })
+    }
+    if (params.type === 'SHOWDETAIL') {
+      console.log('获取打开券详情参数: ', params);
+      const data = params.data;
+      api.doRequestCheckSessionSendCoupon({
+        path: 'pay_ad/ad_open_card',
+        method: 'POST',
+        data,
+        success: res => {
+          if (res.data.card_list) {
+            res.data.card_list.forEach((v, i) => {
+              v.cardId = v.card_id
+              v.openCardParams = v.open_params
+              delete v.card_id
+              delete v.open_params
+            })
+            params.setPlugParams(res.data.card_list);
+          } else {
+            TIP.toast(`打开券详情失败 !`);
+          }
+        },
+        fail: err => {}
+      })
+    }
   },
 
   /**

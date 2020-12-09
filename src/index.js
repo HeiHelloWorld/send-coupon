@@ -28,8 +28,6 @@ Component({
       type: String,
       value: ''
     },
-    plug_sign: String,
-    open_params: Object,
   },
   data: {
     flag: false,
@@ -40,6 +38,7 @@ Component({
     sign: '', // 插件所需签名
     open_some_one: 0, // 默认打开第一张券详情
     receive_success: false, // 领券成功
+    receive_fail: false,  // 所有券无法领取
     user_click: false,  // 用户点击某张券详情
   },
   pageLifetimes: {
@@ -66,15 +65,6 @@ Component({
     },
   },
   observers: {
-    'plug_sign': function (sign) {
-      const { mateAndCouponInfo } = this.data;
-      if (sign && mateAndCouponInfo && mateAndCouponInfo.sign_type === 1) this.setData({ sign });
-    },
-    'open_params': function (params) {
-      if (params instanceof Array && Array.isArray(params) && params.length && params[0]['openCardParams']) {
-        this.openCouponDetail(params);
-      }
-    },
     'stock_max, token, openid, loc_name': function (stock_max, token, openid, loc_name) {
       if (stock_max && token && openid && loc_name) {
         this.getCouponInfo();
@@ -97,8 +87,14 @@ Component({
         success: res => {
           const stock_list = res.data.stock_list;
           if (stock_list) {
+            res.data.sign_type = 1;
             if (res.data.sign_type === 1) {
-              _this.triggerEvent('_getPlugSign', { stock_list })
+              const fn = {
+                type: 'SENDCOUPON',
+                data: stock_list,
+                setPlugParams: sign => _this.setData({ sign })
+              }
+              _this.triggerEvent('_setPlugData', fn);
             } else {
               _this.setData({ sign: res.data.sign })
             }
@@ -166,6 +162,9 @@ Component({
             const ob = failArr.find(g => g.stock_id === v.stock_id);
             if (ob) v.errMsg = ob.message
           })
+          if (failArr.length === stock_list.length) {
+            _this.setData({ receive_fail: true })
+          }
         }
         this.setData({
           stock_list, 
@@ -215,11 +214,13 @@ Component({
         open_some_one,
         stock_list, 
         user_click, 
+        receive_fail, 
         mateAndCouponInfo 
       } = this.data;
 
-      if (stock_list[open_some_one].errMsg && user_click) {
-        TIP.toast(stock_list[open_some_one].errMsg);
+      const msg = stock_list[open_some_one].errMsg;
+      if ((msg && user_click) || (msg && receive_fail)) {
+        TIP.toast(msg);
         this.setData({ user_click: !user_click })
         return;
       }
@@ -232,7 +233,12 @@ Component({
       const data = { loc_name, token, openid, stock_list: stockList };
 
       if (mateAndCouponInfo.sign_type === 1) {
-        this.triggerEvent('_getOpenParams', data);
+        const fn = {
+          type: 'SHOWDETAIL',
+          data,
+          setPlugParams: result => _this.openCouponDetail(result)
+        }
+        _this.triggerEvent('_setPlugData', fn);
       } else {
         api.doRequestCheckSessionSendCoupon({
           path: 'pay_ad/ad_open_card',
@@ -271,9 +277,9 @@ Component({
      * 打开卡券详情页
      * @param {*} params 
      */
-    openCouponDetail(list) {
+    openCouponDetail(cardList) {
       wx.openCard({
-        cardList: list,
+        cardList,
         complete: res => {
           console.log('openCard => ', res)
         }
