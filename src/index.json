@@ -1,7 +1,7 @@
 {
   "component": true,
   "usingComponents": {
-    "other": "./other",
+    "coupon-list": "./coupon-list/coupon-list",
     "send-coupon": "plugin://sendCoupon/send-coupon"
   },
   "componentGenerics": {

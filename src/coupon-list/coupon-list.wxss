@@ -1,0 +1,185 @@
+/* @import "./common.wxss"; */
+/* @import "./reset.wxss"; */
+
+.coupon-wrap {
+  width: 100%;
+  min-height: 100vh;
+}
+.coupon-one-bg {
+  background-repeat: no-repeat;
+  /* background-position: center;
+  background-size: cover; */
+  background-size: 100% 100%;
+}
+.coupon-wrap-main {
+  padding-bottom: 110rpx;
+}
+
+.coupon-main {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 600rpx;
+  margin-bottom: 60rpx;
+  font-size: 48rpx;
+  background-color: #fff;
+  border-radius: 20rpx;
+}
+
+.coupon-btn {
+  width: 100%;
+  height: 80rpx;
+  line-height: 80rpx;
+  text-align: center;
+  font-size: 36rpx;
+  color: #FFF;
+  border-radius: 10rpx;
+  background-color: rgb(9, 112, 23);
+}
+
+
+/* 多张券 */
+.page-header {
+  width: 100%;
+  height: 274rpx;
+  background-image: url('https://cdn.haowuji123.com/statics/coupon-header-cy@2x.png');
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+}
+.coupon-btn-more {
+  width: 358rpx;
+  height: 100rpx;
+  line-height: 100rpx;
+  font-size: 32rpx;
+  border-radius: 4rpx;
+  background: #2BA064;
+  margin: 58rpx auto 30rpx;
+}
+
+.coupon-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+.coupon-header-img {
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: 100%;
+}
+.coupon-header-title {
+  margin: 24rpx 0rpx 38rpx 0rpx;
+  height: 40rpx;
+  line-height: 40rpx;
+  font-size: 40rpx;
+  color: #000;
+
+}
+/* 单张券样式 */
+.coupon-main-more {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  width: 706rpx;
+  height: 166rpx;
+  font-size: 28rpx;
+  margin: 0rpx 0rpx 20rpx 22rpx;
+  background-image: url('https://cdn.haowuji123.com/statics/coupon-bg-cy@2x.png');
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+}
+.coupon-left {
+  display: flex;
+  width: 460rpx;
+}
+.brand-logo {
+  width: 138rpx;
+  height: 138rpx;
+  margin: 14rpx;
+  border-radius: 100%;
+}
+.coupon-info {
+  padding-top: 46rpx;
+}
+.coupon-name {
+  height: 28rpx;
+  line-height: 28rpx;
+  margin-bottom: 20rpx;
+  font-size: 28rpx;
+  color: #000;
+}
+.coupon-time {
+  height: 22rpx;
+  line-height: 22rpx;
+  font-size: 22rpx;
+  color: #787878;
+}
+.coupon-right {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 247rpx;
+  padding-top: 26rpx;
+}
+.coupon-money-wrap {
+  height: 56rpx;
+  line-height: 56rpx;
+  margin-bottom: 24rpx;
+  font-size: 56rpx;
+  color: #FFFFFF;
+}
+.coupon-money-num {
+  
+}
+.coupon-money-ds {
+  width: 30rpx;
+  height: 28rpx;
+  line-height: 28rpx;
+  font-size: 28rpx;
+}
+.coupon-min-money {
+  height: 28rpx;
+  line-height: 28rpx;
+  font-size: 28rpx;
+  color: #FFFFFF;
+}
+.received {
+  position: absolute;
+  top: 0rpx;
+  right: 0rpx;
+  width: 116rpx;
+  height: 106rpx;
+}
+
+.coupon-wrap-footer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 110rpx;
+  margin-top: -110rpx;
+}
+.coupon-wrap-footer-top {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20rpx;
+}
+.coupon-wrap-footer-top image {
+  width: 28rpx;
+  height: 26rpx;
+  margin-right: 6rpx;
+}
+.coupon-wrap-footer-top span {
+  height: 22rpx;
+  font-size: 22rpx;
+  font-weight: 400;
+  color: #75787C;
+  line-height: 22rpx;
+}
+.coupon-wrap-footer-bottom {
+  height: 22rpx;
+  line-height: 22rpx;
+  font-size: 22rpx;
+  font-weight: 400;
+  color: #B9BDC2;
+}

@@ -1,6 +1,6 @@
 {
   "name": "send-coupon-cy",
-  "version": "1.0.3",
+  "version": "1.0.8",
   "description": "好物集发券组件",
   "main": "miniprogram_dist/index.js",
   "scripts": {

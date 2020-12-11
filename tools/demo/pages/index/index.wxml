@@ -4,5 +4,6 @@
   openid="{{openid}}" 
   stock_max="{{stock_max}}" 
   loc_name="{{loc_name}}" 
-  tag_id="{{tag_id}}"
+  tag_id="{{tag_id}}" 
+  bind:_setPlugData="setPlugData" 
 />
