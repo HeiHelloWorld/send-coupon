@@ -95,7 +95,7 @@ Page({
       wx.request({
         url: 'YOUR_PATH',
         data: {
-          stock_list: plugParams.stock_list // 参数说明见附表二
+          stock_list: plugParams.data // 参数说明见附表二
         },
         method: 'YOUR_METHOD',
         success: res => {
@@ -109,7 +109,7 @@ Page({
     }
     if (plugParams.type === 'SHOWDETAIL') {
       // 获取打开券详情所需签名
-      const data = params.data;
+      const data = plugParams.data;
       wx.request({
         url: 'YOUR_PATH',
         data,  // 参数说明见附表三
@@ -122,6 +122,7 @@ Page({
           const open_params = [
             {
               cardId: 'STOCK_ID',
+              code: 'COUPON_CODE',
               openCardParams: 'OPEN_CARD_PARAMS'
             }
           ]
@@ -133,6 +134,59 @@ Page({
   }
 })
 ```
+
+##### 五. openCardParams生成方法 (非第三方签名请忽略该部分)
+1. openCardParams参数格式: mch_id=商户号&sign=将要生成的签名key
+2. 签名方式: 对单张券信息进行签名, 即单张券信息参数平铺后, coupon_code, open_params, stock_id 按照参数名 ASCII 码从小到大排序(字典序), 使用 URL 键值对的格式(即key1=value1&key2=value2…)拼接成字符串
+3. 拼接秘钥 key, 用 api 秘钥进行 HMAC-SHA256 签名, 映射后得到最终的请求参数card_id, code 和 open_params, 详见[签名算法][签名算法]
+
+4. 举例: 
+```
+[
+  {
+    coupon_code: '123456',
+    stock_id: '654321',
+    mch_id: '888888'
+  },
+  {
+    coupon_code: '3456789',
+    stock_id: '9876543',
+    mch_id: '999999'
+  }
+]
+```
+  + 第一步 对参数按照 key=value 的格式, 并按照参数名 ASCII 字典序排序如下:
+  ```
+  第一张券: stringA=coupon_code=123456&mch_id=888888&stock_id=654321
+  第二张券: stringB=coupon_code=3456789&mch_id=999999&stock_id=9876543
+  ```
+  + 第二步 拼接API密钥 (**注: HMAC-SHA256 签名方式**)
+  ```
+  第一张券: 
+    stringtempA: stringA+'&key=xxx' (key为 商户平台设置的密钥key)
+    sign = hash_hmac('sha256', stringtempA, key).toUpperCase() = "xxxxx"
+  第二张券: 
+    stringtempB: stringB+'&key=xxx' (key为 商户平台设置的密钥key)
+    sign = hash_hmac('sha256', stringtempB, key).toUpperCase() = "xxxxx"
+  ```
+  + 第三步 得到最终数据
+    - stock_id 映射为 card_id
+    - coupon_code 映射为 code
+    - mch_id 和 sign 拼接在 openCardParams 中
+    ```
+    [
+      {
+        cardId: stock_id,
+        code: coupon_code,
+        openCardParams: `mch_id=${发券商户号}&sign=${sign}`
+      }
+    ]
+    ```
+
+-----
+-----
+-----
+
 + 附表一 plugParams 属性说明
 |  变量    |  类型  | 说明 |
 |:----|:----:|:----|
@@ -168,6 +222,7 @@ Page({
 |  变量    |  类型  | 必填? |  说明 |
 |:----|:----:|:----:|:----|
 | cardId | String | 是 | 券的批次号 |
+| code | String | 是 | 券 coupon_code |
 | openCardParams | String | 是 | 打开参数, 格式为 `mch_id=商户号&sign=生成的签名` |
 
 -------
@@ -179,5 +234,6 @@ Page({
 
 -------
 
-[01]: 'https://mp.weixin.qq.com/'
-[npm支持]: 'https://developers.weixin.qq.com/miniprogram/dev/devtools/npm.html'
+[01]: https://mp.weixin.qq.com/
+[npm支持]: https://developers.weixin.qq.com/miniprogram/dev/devtools/npm.html
+[签名算法]: https://pay.weixin.qq.com/wiki/doc/api/micropay.php?chapter=4_3

@@ -29,7 +29,8 @@
         <image src="{{item.logo}}" class="brand-logo" />
         <view class="coupon-info">
           <view class="coupon-name">{{item.name}}</view>
-          <view class="coupon-time">有效期 {{item.start_time}} - {{item.end_time}}</view>
+          <!-- <view class="coupon-time">有效期 {{item.start_time}} - {{item.end_time}}</view> -->
+          <view class="coupon-time">有效期 {{item.step_time}}天</view>
         </view>
       </view>
       <view class="coupon-right">
@@ -38,7 +39,7 @@
         </view>
         <view class="coupon-min-money">满{{item.transaction_minimum/100}}元可用</view>
       </view>
-      <image wx:if="{{item.send_type === 0 || item.coupon_code !== ''}}" src="{{coupon_receive}}" class="received" />
+      <image wx:if="{{item.coupon_code !== ''}}" src="{{coupon_receive}}" class="received" />
     </view>
     <view class="coupon-btn coupon-btn-more" data-id="0" bindtap="_moreCouponDetail">{{mateInfo.btn_text}}</view>
   </view>

@@ -13,7 +13,8 @@ let wechatLogin = false
 
 // ************ 发券插件专用 start ************
 
-const sendCouponBaseUrl = 'https://hwj-apicb-test-k8s.vchangyi.com/'
+// const sendCouponBaseUrl = 'https://hwj-apicb-test-k8s.vchangyi.com/';
+const sendCouponBaseUrl = 'https://api-prod.haowuji123.com/';
 
 const doRequest = req => {
   if (!token.token) {

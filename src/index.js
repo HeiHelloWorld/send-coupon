@@ -36,9 +36,10 @@ Component({
     sendWill: [], // 待领取的商户券列表
     mateAndCouponInfo: null, // 素材和券信息
     sign: '', // 插件所需签名
+    send_coupon_merchant: '', // 发券商户号
     open_some_one: 0, // 默认打开第一张券详情
     receive_success: false, // 领券成功
-    receive_fail: false,  // 所有券无法领取
+    receive_all_fail: false,  // 所有券无法领取
     user_click: false,  // 用户点击某张券详情
   },
   pageLifetimes: {
@@ -87,21 +88,24 @@ Component({
         success: res => {
           const stock_list = res.data.stock_list;
           if (stock_list) {
-            res.data.sign_type = 1;
+            // TODO 测试数据
+            // res.data.sign_type = 1;
             if (res.data.sign_type === 1) {
               const fn = {
                 type: 'SENDCOUPON',
                 data: stock_list,
-                setPlugParams: sign => _this.setData({ sign })
+                setPlugParams: params => _this.setSignAndMmerchant(params)
               }
               _this.triggerEvent('_setPlugData', fn);
             } else {
-              _this.setData({ sign: res.data.sign })
+              _this.setSignAndMmerchant(res.data);
             }
             const sendWill = stock_list.filter(v => v.send_type === 1);
             stock_list.map(v => {
               v.start_time = Tool.timestampToDay(v.available_begin_time);
               v.end_time = Tool.timestampToDay(v.available_end_time);
+              // TODO 测试数据
+              v.step_time = Tool.timestampToNumber(v.available_begin_time, v.available_end_time);
             })
             _this.setData({
               stock_list,
@@ -114,6 +118,17 @@ Component({
           TIP.loaded()
         },
         fail: err => { TIP.loaded(); }
+      })
+    },
+
+    /**
+     * 设置签名及发券商户号
+     * @param {*} params 
+     */
+    setSignAndMmerchant(data) {
+      this.setData({
+        sign: data.sign,
+        send_coupon_merchant: data.send_coupon_merchant
       })
     },
 
@@ -145,7 +160,7 @@ Component({
       if (params.detail.errcode === 'OK') {
         const data = params.detail.send_coupon_result, { stock_list } = this.data;
         // 领券结果上报
-        // this.sendCouponResult(data);
+        this.sendCouponResult(data);
 
         const results = data.filter(g => g.code === 'SUCCESS');
         const failArr = data.filter(g => g.code !== 'SUCCESS');
@@ -163,7 +178,7 @@ Component({
             if (ob) v.errMsg = ob.message
           })
           if (failArr.length === stock_list.length) {
-            _this.setData({ receive_fail: true })
+            _this.setData({ receive_all_fail: true })
           }
         }
         this.setData({
@@ -214,20 +229,29 @@ Component({
         open_some_one,
         stock_list, 
         user_click, 
-        receive_fail, 
+        sendWill, 
+        receive_all_fail, 
         mateAndCouponInfo 
       } = this.data;
-
+      
       const msg = stock_list[open_some_one].errMsg;
-      if ((msg && user_click) || (msg && receive_fail)) {
+      const coupon_code = stock_list[open_some_one].coupon_code;
+      const stock_id = stock_list[open_some_one].stock_id;
+      // 券领取失败
+      if ((msg && user_click && !coupon_code) || (msg && receive_all_fail && !coupon_code)) {
         TIP.toast(msg);
         this.setData({ user_click: !user_click })
         return;
       }
 
+      if (!sendWill.length && !coupon_code) {
+        TIP.toast('抱歉! 服务器开小差了～');
+        return;
+      }
+
       stockList.push({
-        stock_id: stock_list[open_some_one].stock_id,
-        coupon_code: stock_list[open_some_one].coupon_code
+        stock_id,
+        coupon_code
       });
 
       const data = { loc_name, token, openid, stock_list: stockList };
@@ -267,9 +291,9 @@ Component({
      * @param {*} params 
      */
     moreCouponDetail(e) {
-      const open_some_one = Number(e.detail.id), { receive_success } = this.data;
+      const open_some_one = Number(e.detail.id), { receive_success, sendWill } = this.data;
       this.setData({ open_some_one });
-      if (!receive_success) return; // 券未领取 将触发领券机制
+      if (!receive_success && sendWill.length) return; // 券未领取 将触发领券机制
       this.setData({ user_click: true }, () => this.getDetailParams());
     },
 

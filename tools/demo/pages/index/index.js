@@ -21,9 +21,9 @@ Page({
         method: 'POST',
         data: { stock_list },
         success: res => {
-          console.log('签名结果', res.data.sign)
+          console.log('签名结果', res.data)
           if (res.data.sign) {
-            params.setPlugParams(res.data.sign);
+            params.setPlugParams(res.data);
           }
         },
         fail: err => {}
@@ -86,11 +86,12 @@ Page({
    */
   onLoad: function (options) {
     _this = this;
-    this.getUserOpenid()
+    // this.getUserOpenid()
     this.setData({
       token: 'BhGDQJ368Ft8iShb6usAH4Xli8w4BerE',
       stock_max: 3,
-      loc_name: 'fb_ad_loc'
+      loc_name: 'fb_ad_loc',
+      openid: 'oiSTd4u2grvSakCt2d9D55N0kgoM'
     })
   },
 
