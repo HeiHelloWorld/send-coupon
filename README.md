@@ -100,9 +100,13 @@ Page({
         method: 'YOUR_METHOD',
         success: res => {
           /** 
-          * 成功获取签名后, 调用方法进行赋值
+          * 成功获取签名及商户号后, 调用方法进行赋值
           */
-          plugParams.setPlugParams('YOUR_SIGN')
+          const signAndMmerchant = {
+            sign: '插件签名 => String',
+            send_coupon_merchant: '发券商户号 => String'
+          }
+          plugParams.setPlugParams(signAndMmerchant)
         },
         fail: err => {}
       })
